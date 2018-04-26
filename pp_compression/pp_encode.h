@@ -7,12 +7,14 @@
 #include <fstream>
 #include <queue>
 #include <map>
+#include <cfloat>
 #define MAX_SIZE 270
-#define WRITE_BUFF_SIZE 10
+#define WRITE_BUFF_SIZE 20
+#define PSEUDO_EOF 256 //伪结束符eof，用于判断是否是尾部补齐
 
 struct Huffman_node
 {
-    int id; // 使用int类型，因为要插入值为256的pseudo-EOF
+    int id;
     float freq;
     std::string code;
     Huffman_node  *left,
@@ -28,14 +30,13 @@ class pp_encode
         std::string InputFileName;
         std::string OutputFileName;
         int encode();
-        int decode();
-        float restore_examine();
         virtual ~pp_encode();
 
     private:
+        int size_list; //字符表长
         int count_each_byte(std::string, float*);
-        float byte_freq[256] = {0.};
-        Node_ptr node_array[256];
+        float byte_freq[MAX_SIZE] = {0.};
+        Node_ptr node_array[MAX_SIZE];
         Node_ptr root;
         std::map<int, std::string> table;
 
@@ -62,6 +63,8 @@ class pp_encode
         int calculate_huffman_codes();//根据建立的huffman tree计算huffman code
 
         int do_compress();
+
+
 };
 
 #endif // PP_ENCODE_H
