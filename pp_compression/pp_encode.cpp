@@ -44,7 +44,7 @@ int pp_encode::get_byte_frequency()
         node->parent = NULL;
         node->right = NULL;
         node_array[i] = node;
-    }//ÓÐÒ»Ð©×éºÏ¿ÉÄÜ²»»á³öÏÖ£¬²»ÐèÒª´æ£¬ÕâÀï¿ÉÒÔ¸Ä£¬Êý×é´óÐ¡¿ÉÄÜÒª´óÓÚ255
+    }//æœ‰ä¸€äº›ç»„åˆå¯èƒ½ä¸ä¼šå‡ºçŽ°ï¼Œä¸éœ€è¦å­˜ï¼Œè¿™é‡Œå¯ä»¥æ”¹ï¼Œæ•°ç»„å¤§å°å¯èƒ½è¦å¤§äºŽ255
 	return 0;
 }
 
@@ -99,7 +99,7 @@ int pp_encode::create_map_table(const Node_ptr node, bool left)
     else
         node->code = node->parent->code + "1";
 
-    // Èç¹ûÊÇÒ¶×Ó½Úµã£¬ÔòÊÇÒ»¸ö¡°ÓÐÐ§¡±½Úµã£¬¼ÓÈë±àÂë±í
+    // å¦‚æžœæ˜¯å¶å­èŠ‚ç‚¹ï¼Œåˆ™æ˜¯ä¸€ä¸ªâ€œæœ‰æ•ˆâ€èŠ‚ç‚¹ï¼ŒåŠ å…¥ç¼–ç è¡¨
     if (node->left == NULL && node->right == NULL)
         table[node->id] = node->code;
     else
@@ -140,9 +140,9 @@ int pp_encode::do_compress()
     {
         output_file << table_it->first << " " << table_it->second << std::endl;
     }
-    // µÚ2~(size+1)ÐÐÐ´ÈëhuffmanÊ÷£¬¼´Ã¿ÐÐÐ´Èë×Ö·û+huffman±àÂë£¬Èç"43 00100"
+    // ç¬¬2~(size+1)è¡Œå†™å…¥huffmanæ ‘ï¼Œå³æ¯è¡Œå†™å…¥å­—ç¬¦+huffmanç¼–ç ï¼Œå¦‚"43 00100"
 
-    // µÚsize+2ÐÐÐ´Èëhuffman±àÂë
+    // ç¬¬size+2è¡Œå†™å…¥huffmanç¼–ç 
     if (!input_file.is_open())
 	{
 		std::cout << "Error!";
@@ -166,7 +166,7 @@ int pp_encode::do_compress()
                 //exit(1);
             }
         }
-        //huffman codeÒÔ¶þ½øÖÆÁ÷Ð´Èëµ½Êä³öÎÄ¼þ
+        //huffman codeä»¥äºŒè¿›åˆ¶æµå†™å…¥åˆ°è¾“å‡ºæ–‡ä»¶
         for (int i = 0; i + 7 < code.size(); i += 8)
         {
             out_c = 0;
