@@ -12,7 +12,7 @@
 
 struct Huffman_node
 {
-    int id; // Ê¹ÓÃintÀàĞÍ£¬ÒòÎªÒª²åÈëÖµÎª256µÄpseudo-EOF
+    int id; // ä½¿ç”¨intç±»å‹ï¼Œå› ä¸ºè¦æ’å…¥å€¼ä¸º256çš„pseudo-EOF
     float freq;
     std::string code;
     Huffman_node  *left,
@@ -47,19 +47,19 @@ class pp_encode
 
                     return (*c1).freq > (*c2).freq;
                 }
-        };// ÓÃÓÚ±È½ÏÓÅÏÈ¶ÓÁĞÖĞÔªËØ¼äµÄË³Ğò
+        };// ç”¨äºæ¯”è¾ƒä¼˜å…ˆé˜Ÿåˆ—ä¸­å…ƒç´ é—´çš„é¡ºåº
         std::priority_queue< Node_ptr, std::vector<Node_ptr>, Compare > pq;
 
-        /*ÒÔÏÂÊÇÓÃÓÚÑ¹ËõµÄº¯Êı*/
-        int create_pq();//µ÷ÓÃÕâ¸öº¯ÊıÍ³¼ÆÎÄ¼şÖĞ¸÷ÖÖbyteµÄÆµÂÊ£¬²¢½¨Á¢ÓÅÏÈ¶ÓÁĞ
+        /*ä»¥ä¸‹æ˜¯ç”¨äºå‹ç¼©çš„å‡½æ•°*/
+        int create_pq();//è°ƒç”¨è¿™ä¸ªå‡½æ•°ç»Ÿè®¡æ–‡ä»¶ä¸­å„ç§byteçš„é¢‘ç‡ï¼Œå¹¶å»ºç«‹ä¼˜å…ˆé˜Ÿåˆ—
 
-        int get_byte_frequency();//ÔÚcreat_pqÖĞµ÷ÓÃµÄÓÃÓÚÍ³¼ÆÆµÂÊµÄ
+        int get_byte_frequency();//åœ¨creat_pqä¸­è°ƒç”¨çš„ç”¨äºç»Ÿè®¡é¢‘ç‡çš„
 
-        int build_huffman_tree();//¸ù¾İpq½¨Á¢huffman tree
+        int build_huffman_tree();//æ ¹æ®pqå»ºç«‹huffman tree
 
-        int create_map_table(const Node_ptr node, bool left);//ÔÚcalculate_huffman_codesÖĞ±»µ÷ÓÃ
+        int create_map_table(const Node_ptr node, bool left);//åœ¨calculate_huffman_codesä¸­è¢«è°ƒç”¨
 
-        int calculate_huffman_codes();//¸ù¾İ½¨Á¢µÄhuffman tree¼ÆËãhuffman code
+        int calculate_huffman_codes();//æ ¹æ®å»ºç«‹çš„huffman treeè®¡ç®—huffman code
 
         int do_compress();
 };
