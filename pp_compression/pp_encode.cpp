@@ -14,24 +14,27 @@ pp_encode::pp_encode(std::string FileName)
 /*以下是压缩部分*/
 /*The compression part is as below*/
 
-int pp_encode::count_each_byte(std::string line, float stat[])
+/*int pp_encode::count_each_byte(std::string line, float stat[])
 {
     /*use the integer value of a certain byte(like 5 for 00000101) as its id
     ant in this function, we count the frequency of each byte in each line*/
-    for (int i = 0; i != line.size(); ++i)
+    //unsigned char nl = '\n';
+    /*for (int i = 0; i != line.size(); ++i)
     {
     	int byte_num = 0;
     	unsigned char k = 0x80;
     	unsigned char l = line[i];
 		stat[(int)l] += 0.01;
+		stat[10] += 0.01;
 	}
 	return 0;
-}
+}*/
 
 int pp_encode::get_byte_frequency()
 {
     /*this function do the frequency counting job,
     and generate a node array for huffman tree*/
+    char in_char;
     std::string buffer, word;
 
     std::ifstream input_file(InputFileName.c_str(), std::ifstream::binary);
@@ -42,8 +45,16 @@ int pp_encode::get_byte_frequency()
 	}
 	while (!input_file.eof())
 	{
+		/*
 		std::getline(input_file, buffer);
 		count_each_byte(buffer, byte_freq);
+		*/
+		input_file.get(in_char);
+        unsigned char u_char = (unsigned char)in_char;
+        ++total_byte;
+        if (input_file.eof())
+            break;
+        byte_freq[(int)u_char] = byte_freq[(int)u_char] + 0.01;
 	}
 	input_file.close();
 	int j = 0;
@@ -61,14 +72,14 @@ int pp_encode::get_byte_frequency()
         node_array[j++] = node;
     }
     //下面插入伪结束符
-    Node_ptr node = new Huffman_node();
+    /*Node_ptr node = new Huffman_node();
     node->id = PSEUDO_EOF;
-    node->freq = FLT_MAX;
+    node->freq = 0.001;
     node->code = "";
     node->left = NULL;
     node->right = NULL;
     node->parent = NULL;
-    node_array[j++] = node;
+    node_array[j++] = node;*/
     size_list = j;
 	return 0;
 }
@@ -155,12 +166,14 @@ int pp_encode::calculate_huffman_codes()
 int pp_encode::do_compress()
 {
     std::ifstream input_file(InputFileName.c_str(), std::ifstream::binary);
-	std::ofstream output_file(OutputFileName.c_str(), std::ios::out | std::ios::trunc);
+	std::ofstream output_file(OutputFileName.c_str(), std::ios::out | std::ios::trunc | std::ofstream::binary);
     std::map<int, std::string>::iterator table_it;
     std::string code = "", buffer, out_string;
     int i, j, length;
+    char in_char;
     unsigned char out_c, tmp_c;
 
+    output_file << total_byte << std::endl;
     output_file << size_list << std::endl;
     //写入编码表长
     for (table_it = table.begin(); table_it != table.end(); ++table_it)
@@ -175,6 +188,7 @@ int pp_encode::do_compress()
 		std::cout << "Error!";
 		exit(1);
 	}
+	/*
     while (!input_file.eof())
     {
         out_string.clear();
@@ -192,6 +206,7 @@ int pp_encode::do_compress()
                 //exit(1);
             }
         }
+        code += table[10];
         //huffman code以二进制流写入到输出文件
         for (i = 0; i + 7 < code.size(); i += 8)
         {
@@ -209,9 +224,46 @@ int pp_encode::do_compress()
         code = code.substr(i, code.size());
         output_file << out_string;
     }
+    */
+    code.clear();
+    while (!input_file.eof())
+    {
+        input_file.get(in_char);
+        unsigned char u_char = (unsigned char)in_char;
+        table_it = table.find((unsigned char)u_char);
+        if (table_it != table.end())
+            code += table_it->second;
+        else
+        {
+            printf("Can't find the huffman code of character %X\n", in_char);
+            exit(1);
+        }
+        // 当总编码的长度大于预设的WRITE_BUFF_SIZE时再写入文件
+        length = code.length();
+        if(length > WRITE_BUFF_SIZE)
+        {
+            out_string.clear();
+            for (i = 0; i + 7 < length; i += 8)
+            {
+                out_c = 0;
+                for (j = 0; j < 8; ++j)
+                {
+                    if ('0' == code[i + j])
+                        tmp_c = 0;
+                    else
+                        tmp_c = 1;
+                    out_c += tmp_c << (7 - j);
+                }
+                out_string += out_c;
+            }
+            output_file << out_string;
+            code = code.substr(i, length - i);
+        }
+    }
+
     //插入伪结束符
-    table_it = table.find(PSEUDO_EOF);
-    code += table_it->second;
+    //table_it = table.find(PSEUDO_EOF);
+    //code += table_it->second;
     //写入不足一字节的编码及结束符，并进行尾部补齐
     length = code.length();
     out_c = 0;
