@@ -1,4 +1,4 @@
-#include <iostream>
+include <iostream>
 #include "pp_encode.h"
 #include "pp_decode.h"
 
@@ -27,14 +27,19 @@ int decompress_mode()
 int main()
 {
     int mode;
-    std::cout << "Enter mode : (0 for encode, 1 for decode)" << std::endl;
-    std::cout << ">>";
-    std::cin >> mode;
-    if (mode == 0)
-        compress_mode();
-    else if (mode == 1)
-        decompress_mode();
-    else
-        std::cout << "Error!";
+    while (1)
+    {
+        std::cout << "Enter mode : (0 for encode, 1 for decode, 2 for exit)" << std::endl;
+        std::cout << ">>";
+        std::cin >> mode;
+        if (mode == 0)
+            compress_mode();
+        else if (mode == 1)
+            decompress_mode();
+        else if (mode == 2)
+            break;
+        else
+            std::cout << "Error!";
+    }
     return 0;
 }
