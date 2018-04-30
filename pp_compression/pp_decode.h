@@ -7,7 +7,7 @@
 #include <fstream>
 #define MAX_SIZE 270
 #define WRITE_BUFF_SIZE 20
-#define PSEUDO_EOF 256 //伪结束符eof，用于判断是否是尾部补齐
+#define PSEUDO_EOF 256 //浼粨鏉熺eof锛岀敤浜庡垽鏂槸鍚︽槸灏鹃儴琛ラ綈
 
 struct Huffman_node_2
 {
@@ -33,6 +33,8 @@ class pp_decode
         Node_ptr_2 root;
 
         int size_rd;
+
+        long long total_byte;
 
         int rebuild_huffman_tree();
 
