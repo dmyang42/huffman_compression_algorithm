@@ -11,7 +11,7 @@ pp_decode::pp_decode(std::string FileName)
     OutputFileName = FileName + ".out";
 }
 
-/*ÒÔÏÂÊÇ½âÑ¹²¿·Ö*/
+/*ä»¥ä¸‹æ˜¯è§£åŽ‹éƒ¨åˆ†*/
 /*the decompress part is as below*/
 
 int pp_decode::rebuild_huffman_tree()
@@ -31,7 +31,9 @@ int pp_decode::rebuild_huffman_tree()
     root->right = NULL;
     root->parent = NULL;
 
+    input_file >> total_byte;
     input_file >> size_rd;
+
     if (size_rd > MAX_SIZE)
     {
         printf("The number of nodes is not valid, maybe the compressed file has been broken.\n");
@@ -56,7 +58,7 @@ int pp_decode::rebuild_huffman_tree()
                 exit(1);
             }
 
-            // Èç¹ûµ½ÁË¿Õ£¬ÔòÐÂ½¨Ò»¸ö½Úµã
+            // å¦‚æžœåˆ°äº†ç©ºï¼Œåˆ™æ–°å»ºä¸€ä¸ªèŠ‚ç‚¹
             if (tmp == NULL)
             {
                 new_node = new Huffman_node_2();
@@ -64,7 +66,7 @@ int pp_decode::rebuild_huffman_tree()
                 new_node->right = NULL;
                 new_node->parent = node;
 
-                // Èç¹ûÊÇ×îºóÒ»¸ö0»ò1,ËµÃ÷µ½ÁËÒ¶×Ó½Úµã£¬¸øÒ¶×Ó½Úµã¸³Ïà¹ØµÄÖµ
+                // å¦‚æžœæ˜¯æœ€åŽä¸€ä¸ª0æˆ–1,è¯´æ˜Žåˆ°äº†å¶å­èŠ‚ç‚¹ï¼Œç»™å¶å­èŠ‚ç‚¹èµ‹ç›¸å…³çš„å€¼
                 if (j == length - 1)
                 {
                     new_node->id = id;
@@ -78,14 +80,14 @@ int pp_decode::rebuild_huffman_tree()
 
                 tmp = new_node;
             }
-            // Èç¹û²»Îª¿Õ£¬ÇÒµ½ÁË¸Ãhuffman±àÂëµÄ×îºóÒ»Î»£¬ÕâÀïÈ´ÒÑ¾­´æÔÚÁËÒ»¸ö½Úµã£¬¾ÍËµÃ÷
-            // Ô­À´µÄhuffmaninmanÊÇÓÐÎÊÌâµÄ
+            // å¦‚æžœä¸ä¸ºç©ºï¼Œä¸”åˆ°äº†è¯¥huffmanç¼–ç çš„æœ€åŽä¸€ä½ï¼Œè¿™é‡Œå´å·²ç»å­˜åœ¨äº†ä¸€ä¸ªèŠ‚ç‚¹ï¼Œå°±è¯´æ˜Ž
+            // åŽŸæ¥çš„huffmaninmanæ˜¯æœ‰é—®é¢˜çš„
             else if (j == length -1)
             {
                 printf("Huffman code is not valid, maybe the compressed file has been broken.\n");
                 exit(1);
             }
-            // Èç¹û²»Îª¿Õ£¬µ«¸Ã½ÚµãÈ´ÒÑ¾­ÊÇÒ¶×Ó½Úµã£¬ËµÃ÷Ñ°Â·µ½ÁËÆäËû×Ö·ûµÄ±àÂë´¦£¬huffman±àÂëÒ²²»¶Ô
+            // å¦‚æžœä¸ä¸ºç©ºï¼Œä½†è¯¥èŠ‚ç‚¹å´å·²ç»æ˜¯å¶å­èŠ‚ç‚¹ï¼Œè¯´æ˜Žå¯»è·¯åˆ°äº†å…¶ä»–å­—ç¬¦çš„ç¼–ç å¤„ï¼Œhuffmanç¼–ç ä¹Ÿä¸å¯¹
             else if (tmp->left == NULL && tmp->right == NULL)
             {
                 printf("Huffman code is not valid, maybe the compressed file has been broken.\n");
@@ -102,59 +104,78 @@ int pp_decode::rebuild_huffman_tree()
 int pp_decode::do_decompress()
 {
     std::ifstream input_file(InputFileName.c_str(), std::ifstream::binary);
-	std::ofstream output_file(OutputFileName.c_str(), std::ios::out | std::ios::trunc);
-    bool pseudo_eof;
-    int i, id;
+	std::ofstream output_file(OutputFileName.c_str(), std::ios::out | std::ios::trunc | std::ofstream::binary);
+    //bool pseudo_eof;
+    bool file_eof;
+    int i, ID;
     char in_char;
     unsigned char u_char, flag;
+    long long count_byte = 0;
     Node_ptr_2 node;
     std::string buffer, out_string;
 
-    for (int l = 0; l < size_rd + 1; ++l)
+    for (int l = 0; l < size_rd + 2; ++l)
     {
         std::getline(input_file, buffer);
+        //std::cout << buffer << std::endl;
     }
     node = root;
-    pseudo_eof = false;
+    file_eof = false;
+    //pseudo_eof = false;
     while (!input_file.eof())
     {
-        std::getline(input_file, buffer);
-        for (int i = 0; i != buffer.size(); ++i)
+        input_file.get(in_char);
+        unsigned char u_char = (unsigned char)in_char;
+        flag = 0x80;
+        for (i = 0; i < 8; ++i)
         {
-            unsigned char l = buffer[i];
-            flag = 0x80;
-            for (int j = 0; j < 8; ++j)
-            {
 
-                if (l & flag)
-                    node = node->right;
-                else
-                    node = node->left;
-                if (node->left == NULL && node->right == NULL)
+            if (u_char & flag)
+                node = node->right;
+            else
+                node = node->left;
+            if (node->left == NULL && node->right == NULL)
+            {
+                if (count_byte >= total_byte - 1)
                 {
-                    id = node->id;
-                    if (id == PSEUDO_EOF)
-                    {
-                        pseudo_eof = true;
-                        break;
-                    }
-                    else
-                    {
-                        out_string += (unsigned char)node->id;
-                        node = root;
-                    }
-                }
-                if (pseudo_eof)
+                    file_eof = true;
                     break;
-                flag = flag >> 1;
+                }
+                ID = node->id;
+                out_string += (unsigned char)node->id;
+                node = root;
+                ++count_byte;
+                /*if (ID == PSEUDO_EOF)
+                {
+                    pseudo_eof = true;
+                    break;
+                }
+                else
+                {
+                    out_string += (unsigned char)node->id;
+                    node = root;
+                }*/
             }
+            flag = flag >> 1;
         }
-        if (pseudo_eof)
+        if (file_eof)
             break;
+        /*if (pseudo_eof)
+        {
+            output_file << "sbpp";
+            std::cout << "!!!";
+            break;
+        }*/
+        if (WRITE_BUFF_SIZE < out_string.length())
+        {
+            output_file << out_string;
+            out_string.clear();
+        }
     }
+    /*if (input_file.eof())
+        std::cout << "big shit jim";*/
     if (!out_string.empty())
         output_file << out_string;
-
     input_file.close();
     output_file.close();
     return 0;
@@ -170,4 +191,5 @@ int pp_decode::decode()
 pp_decode::~pp_decode()
 {
     //dtor
+}
 }
