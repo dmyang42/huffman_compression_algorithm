@@ -34,6 +34,7 @@ class pp_encode
 
     private:
         int size_list; //字符表长
+        long long total_byte = 0;
         int count_each_byte(std::string, float*);
         float byte_freq[MAX_SIZE] = {0.};
         Node_ptr node_array[MAX_SIZE];
